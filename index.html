@@ -279,14 +279,23 @@
             flex: 1;
         }
         
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: var(--box-shadow);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-        }
+        /* أنماط الجدول الأساسية */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: var(--box-shadow);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+/* التخصيص الجديد لعمود الصفحات */
+#recordsTable td:nth-child(3) {
+    direction: ltr;
+    text-align: left;
+    font-family: monospace;
+    white-space: nowrap;
+}
         
         th, td {
             padding: 15px;
