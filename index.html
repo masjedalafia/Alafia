@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جامع العافية - النظام المتكامل</title>
+    <title>جامع العافية</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -279,14 +279,23 @@
             flex: 1;
         }
         
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: var(--box-shadow);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-        }
+        /* أنماط الجدول الأساسية */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: var(--box-shadow);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+/* التخصيص الجديد لعمود الصفحات */
+#recordsTable td:nth-child(3) {
+    direction: ltr;
+    text-align: left;
+    font-family: monospace;
+    white-space: nowrap;
+}
         
         th, td {
             padding: 15px;
@@ -449,6 +458,47 @@
         .settings-section {
             margin-bottom: 30px;
         }
+        /* أنماط صفحة الطالب */
+.student-profile {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--box-shadow);
+    margin-bottom: 30px;
+}
+
+.student-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    border-right: 4px solid var(--accent-color);
+}
+
+.btn-view {
+    background: var(--accent-color);
+    color: white;
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-view:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.memorization-records {
+    margin-top: 20px;
+}
+
+.memorization-records table {
+    width: 100%;
+    margin-top: 15px;
+}
         
         @media (max-width: 768px) {
             .form-grid {
@@ -655,16 +705,20 @@
         <table id="recordsTable">
             <thead>
                 <tr>
+                    <th>صفحة الطالب</th>
                     <th>رقم الطالب</th>
                     <th>اسم الطالب</th>
-                    <th>رقم الصفحة</th>
-                    <th>التقييم</th>
-                    <th>التاريخ</th>
-                    <th>ملاحظات</th>
+                    <th>الصفحات المحفوظة</th>
+                    <td><button onclick="exportStudentData('${studentId}')">تصدير</button></td>
                     <th id="actions-header">الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
+                <td>
+  <a href="student_page.html?id=${student.id}" class="btn-view">
+    <i class="fas fa-user"></i> صفحة الطالب
+  </a>
+</td>
                 <!-- سيتم ملء البيانات هنا عبر الجافاسكريبت -->
             </tbody>
         </table>
@@ -759,6 +813,7 @@
             <table id="students-table">
                 <thead>
                     <tr>
+                        <th>صفحة الطالب</th>
                         <th>تحديد</th>
                         <th>رقم الطالب</th>
                         <th>اسم الطالب</th>
@@ -767,7 +822,13 @@
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                    <td>
+  <a href="student_page.html?id=${student.id}" class="btn-view">
+    <i class="fas fa-user"></i> صفحة الطالب
+  </a>
+</td>
+                </tbody>
             </table>
         </div>
 
@@ -951,18 +1012,57 @@
         
         // إعداد واجهة البحث
         document.getElementById('student-search-container').style.display = 'none';
-        document.getElementById('admin-search-container').style.display = 'block';
-        document.getElementById('actions-header').style.display = 'table-cell';
+        
         
         loadStudents();
         displayRecords();
     }
     
-    // عرض واجهة الطالب
-    function showStudentApp() {
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        document.getElementById('username-display').textContent = currentUser.username;
+    function displayRecords(filteredRecords = null) {
+    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+    const tableBody = document.querySelector('#recordsTable tbody');
+    tableBody.innerHTML = '';
+    
+    const recordsToDisplay = filteredRecords || systemData.records;
+    
+    if (recordsToDisplay.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="3" class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <p>لا توجد سجلات مسجلة بعد</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    // تجميع الصفحات حسب الطالب مع الترتيب
+    const studentsRecords = {};
+    recordsToDisplay.forEach(record => {
+        if (!studentsRecords[record.studentId]) {
+            studentsRecords[record.studentId] = {
+                name: record.studentName,
+                pages: []
+            };
+        }
+        studentsRecords[record.studentId].pages.push(parseInt(record.pageNumber));
+    });
+
+    // عرض البيانات المجمعة مع الترتيب
+    for (const studentId in studentsRecords) {
+        const student = studentsRecords[studentId];
+        student.pages.sort((a, b) => a - b); // ترتيب الصفحات تصاعدياً
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${studentId}</td>
+            <td>${student.name}</td>
+            <td>${student.pages.join('، ')}</td>
+        `;
+        tableBody.appendChild(row);
+    }
+}
         
         // إخفاء أقسام الإدارة
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
@@ -1152,9 +1252,6 @@ function displayRecords(filteredRecords = null) {
             <td>${record.studentId}</td>
             <td>${record.studentName}</td>
             <td>${record.pageNumber}</td>
-            <td>${evaluationBadge}</td>
-            <td>${record.date}</td>
-            <td>${record.notes || '-'}</td>
             <td class="actions">
                 ${isAdmin || isOwner ? `
                 <button class="btn-danger action-btn" onclick="deleteRecord(${record.id})">
@@ -1305,24 +1402,6 @@ function addStudent() {
     document.getElementById('new-student-group').value = '';
 }
 
-// حذف طالب
-function removeStudent(studentId) {
-    if (!confirm('هل أنت متأكد من حذف هذا الطالب؟ سيتم حذف جميع سجلاته أيضاً.')) return;
-    
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    
-    // حذف الطالب
-    systemData.students = systemData.students.filter(s => s.id !== studentId);
-    
-    // حذف سجلات الطالب
-    systemData.records = systemData.records.filter(r => r.studentId !== studentId);
-    
-    localStorage.setItem(APP_KEY, JSON.stringify(systemData));
-    
-    loadStudents();
-    displayRecords();
-    alert('تم حذف الطالب وسجلاته بنجاح');
-}
 
 // تحميل قائمة الطلاب
 function loadStudents() {
@@ -1391,7 +1470,7 @@ function searchStudents() {
             <td>${student.group || '-'}</td>
             <td>${pagesCount}</td>
             <td class="actions">
-                <button class="btn-primary action-btn" onclick="exportStudentData('${student.id}')">
+                <button class="btn-primary action-btn" onclick="openStudentPage('${student.id}')">
                     <i class="fas fa-download"></i> تصدير
                 </button>
                 ${isOwner ? `
@@ -1409,26 +1488,33 @@ function searchStudents() {
 function exportStudentData(studentId) {
     const systemData = JSON.parse(localStorage.getItem(APP_KEY));
     const student = systemData.students.find(s => s.id === studentId);
-    const studentRecords = systemData.records.filter(r => r.studentId === studentId);
-    
     if (!student) return;
-    
+
+    // ترتيب السجلات حسب رقم الصفحة تصاعدياً
+    const studentRecords = systemData.records
+        .filter(r => r.studentId === studentId)
+        .sort((a, b) => a.pageNumber - b.pageNumber);
+
+    // تنسيق CSV مع إضافة رأس الملف
     let csvContent = "data:text/csv;charset=utf-8,";
-    
-    // عنوان الملف
-    csvContent += `سجل حفظ الطالب ${student.name}\n`;
-    csvContent += `رقم الطالب: ${student.id}\n`;
-    csvContent += `المجموعة: ${student.group || 'غير محدد'}\n\n`;
-    
+    csvContent += `اسم الطالب,${student.name}\n`;
+    csvContent += `رقم الطالب,${student.id}\n`;
+    csvContent += `المجموعة,${student.group || 'غير محدد'}\n\n`;
+
     // عناوين الأعمدة
     csvContent += "رقم الصفحة,التقييم,التاريخ,الملاحظات\n";
-    
-    // بيانات السجلات
+
+    // بيانات السجلات (مرتبة ومهيأة للتصدير)
     studentRecords.forEach(record => {
-        csvContent += `${record.pageNumber},${record.evaluation},${record.date},${record.notes || ''}\n`;
+        csvContent += [
+            record.pageNumber,
+            record.evaluation,
+            record.date,
+            `"${record.notes || ''}"` // وضع الملاحظات بين "" لتجنب مشاكل الفواصل
+        ].join(',') + '\n';
     });
-    
-    // إنشاء الرابط وتنزيل الملف
+
+    // تنزيل الملف
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -1573,7 +1659,11 @@ function saveSettings() {
             
             alert('تم تغيير كلمة المرور بنجاح');
         }
-        
+        // دالة لفتح صفحة الطالب
+function openStudentPage(studentId) {
+    // إنشاء رابط صفحة الطالب مع معلمة ID
+    window.location.href = `student_page.html?id=${studentId}`;
+}
         // عند تحميل الصفحة
         window.onload = function() {
             initSystem();
