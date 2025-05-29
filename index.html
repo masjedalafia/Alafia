@@ -699,10 +699,8 @@
                     <th>صفحة الطالب</th>
                     <th>رقم الطالب</th>
                     <th>اسم الطالب</th>
-                    <th>رقم الصفحة</th>
-                    <th>التقييم</th>
-                    <th>التاريخ</th>
-                    <th>ملاحظات</th>
+                    <th>الصفحات المحفوظة</th>
+                    <td><button onclick="exportStudentData('${studentId}')">تصدير</button></td>
                     <th id="actions-header">الإجراءات</th>
                 </tr>
             </thead>
@@ -1012,11 +1010,51 @@
         displayRecords();
     }
     
-    // عرض واجهة الطالب
-    function showStudentApp() {
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        document.getElementById('username-display').textContent = currentUser.username;
+    function displayRecords(filteredRecords = null) {
+    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+    const tableBody = document.querySelector('#recordsTable tbody');
+    tableBody.innerHTML = '';
+    
+    const recordsToDisplay = filteredRecords || systemData.records;
+    
+    if (recordsToDisplay.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="3" class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <p>لا توجد سجلات مسجلة بعد</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    // تجميع الصفحات حسب الطالب مع الترتيب
+    const studentsRecords = {};
+    recordsToDisplay.forEach(record => {
+        if (!studentsRecords[record.studentId]) {
+            studentsRecords[record.studentId] = {
+                name: record.studentName,
+                pages: []
+            };
+        }
+        studentsRecords[record.studentId].pages.push(parseInt(record.pageNumber));
+    });
+
+    // عرض البيانات المجمعة مع الترتيب
+    for (const studentId in studentsRecords) {
+        const student = studentsRecords[studentId];
+        student.pages.sort((a, b) => a - b); // ترتيب الصفحات تصاعدياً
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${studentId}</td>
+            <td>${student.name}</td>
+            <td>${student.pages.join('، ')}</td>
+        `;
+        tableBody.appendChild(row);
+    }
+}
         
         // إخفاء أقسام الإدارة
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
@@ -1359,24 +1397,6 @@ function addStudent() {
     document.getElementById('new-student-group').value = '';
 }
 
-// حذف طالب
-function removeStudent(studentId) {
-    if (!confirm('هل أنت متأكد من حذف هذا الطالب؟ سيتم حذف جميع سجلاته أيضاً.')) return;
-    
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    
-    // حذف الطالب
-    systemData.students = systemData.students.filter(s => s.id !== studentId);
-    
-    // حذف سجلات الطالب
-    systemData.records = systemData.records.filter(r => r.studentId !== studentId);
-    
-    localStorage.setItem(APP_KEY, JSON.stringify(systemData));
-    
-    loadStudents();
-    displayRecords();
-    alert('تم حذف الطالب وسجلاته بنجاح');
-}
 
 // تحميل قائمة الطلاب
 function loadStudents() {
@@ -1463,26 +1483,33 @@ function searchStudents() {
 function exportStudentData(studentId) {
     const systemData = JSON.parse(localStorage.getItem(APP_KEY));
     const student = systemData.students.find(s => s.id === studentId);
-    const studentRecords = systemData.records.filter(r => r.studentId === studentId);
-    
     if (!student) return;
-    
+
+    // ترتيب السجلات حسب رقم الصفحة تصاعدياً
+    const studentRecords = systemData.records
+        .filter(r => r.studentId === studentId)
+        .sort((a, b) => a.pageNumber - b.pageNumber);
+
+    // تنسيق CSV مع إضافة رأس الملف
     let csvContent = "data:text/csv;charset=utf-8,";
-    
-    // عنوان الملف
-    csvContent += `سجل حفظ الطالب ${student.name}\n`;
-    csvContent += `رقم الطالب: ${student.id}\n`;
-    csvContent += `المجموعة: ${student.group || 'غير محدد'}\n\n`;
-    
+    csvContent += `اسم الطالب,${student.name}\n`;
+    csvContent += `رقم الطالب,${student.id}\n`;
+    csvContent += `المجموعة,${student.group || 'غير محدد'}\n\n`;
+
     // عناوين الأعمدة
     csvContent += "رقم الصفحة,التقييم,التاريخ,الملاحظات\n";
-    
-    // بيانات السجلات
+
+    // بيانات السجلات (مرتبة ومهيأة للتصدير)
     studentRecords.forEach(record => {
-        csvContent += `${record.pageNumber},${record.evaluation},${record.date},${record.notes || ''}\n`;
+        csvContent += [
+            record.pageNumber,
+            record.evaluation,
+            record.date,
+            `"${record.notes || ''}"` // وضع الملاحظات بين "" لتجنب مشاكل الفواصل
+        ].join(',') + '\n';
     });
-    
-    // إنشاء الرابط وتنزيل الملف
+
+    // تنزيل الملف
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
