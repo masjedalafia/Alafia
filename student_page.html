@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <!-- نفس محتوى الهيد من الملف الرئيسي -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة الطالب - جامع العافية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* نفس أنماط الملف الرئيسي */
+        /* أضف هذه الأنماط الإضافية */
+        .student-profile {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .student-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-right: 4px solid #1a5f7a;
+        }
+        .btn-view {
+            background: #57c5b6;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>صفحة الطالب</h1>
+        </div>
+        
+        <div class="student-profile">
+            <div class="student-info">
+                <h2 id="student-name">...</h2>
+                <p><strong>رقم الطالب:</strong> <span id="student-id">...</span></p>
+                <p><strong>المجموعة:</strong> <span id="student-group">...</span></p>
+            </div>
+            
+            <div class="memorization-records">
+                <h3><i class="fas fa-history"></i> سجل الحفظ</h3>
+                <table id="records-table">
+                    <thead>
+                        <tr>
+                            <th>رقم الصفحة</th>
+                            <th>التقييم</th>
+                            <th>التاريخ</th>
+                            <th>ملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // كود جلب بيانات الطالب وعرضها
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentId = urlParams.get('id');
+        
+        if (!studentId) {
+            alert('لم يتم تحديد طالب');
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        const systemData = JSON.parse(localStorage.getItem('jame3alafia_system_v3'));
+        const student = systemData.students.find(s => s.id === studentId);
+        
+        if (!student) {
+            alert('الطالب غير موجود');
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        // عرض بيانات الطالب
+        document.getElementById('student-name').textContent = student.name;
+        document.getElementById('student-id').textContent = student.id;
+        document.getElementById('student-group').textContent = student.group || 'غير محدد';
+        
+        // عرض سجلات الطالب
+        const records = systemData.records.filter(r => r.studentId === studentId);
+        const tableBody = document.querySelector('#records-table tbody');
+        
+        records.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${record.pageNumber}</td>
+                <td>${record.evaluation}</td>
+                <td>${record.date}</td>
+                <td>${record.notes || '-'}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    });
+    </script>
+</body>
+</html>
