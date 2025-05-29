@@ -655,6 +655,7 @@
         <table id="recordsTable">
             <thead>
                 <tr>
+                    <th>صفحة الطالب</th>
                     <th>رقم الطالب</th>
                     <th>اسم الطالب</th>
                     <th>رقم الصفحة</th>
@@ -665,6 +666,11 @@
                 </tr>
             </thead>
             <tbody>
+                <td>
+  <a href="student_page.html?id=${student.id}" class="btn-view">
+    <i class="fas fa-user"></i> صفحة الطالب
+  </a>
+</td>
                 <!-- سيتم ملء البيانات هنا عبر الجافاسكريبت -->
             </tbody>
         </table>
@@ -759,6 +765,7 @@
             <table id="students-table">
                 <thead>
                     <tr>
+                        <th>صفحة الطالب</th>
                         <th>تحديد</th>
                         <th>رقم الطالب</th>
                         <th>اسم الطالب</th>
@@ -767,7 +774,13 @@
                         <th>الإجراءات</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                    <td>
+  <a href="student_page.html?id=${student.id}" class="btn-view">
+    <i class="fas fa-user"></i> صفحة الطالب
+  </a>
+</td>
+                </tbody>
             </table>
         </div>
 
