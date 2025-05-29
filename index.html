@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جامع العافية - النظام المتكامل</title>
+    <title>جامع العافية</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -1003,8 +1003,7 @@
         
         // إعداد واجهة البحث
         document.getElementById('student-search-container').style.display = 'none';
-        document.getElementById('admin-search-container').style.display = 'block';
-        document.getElementById('actions-header').style.display = 'table-cell';
+        
         
         loadStudents();
         displayRecords();
@@ -1244,9 +1243,6 @@ function displayRecords(filteredRecords = null) {
             <td>${record.studentId}</td>
             <td>${record.studentName}</td>
             <td>${record.pageNumber}</td>
-            <td>${evaluationBadge}</td>
-            <td>${record.date}</td>
-            <td>${record.notes || '-'}</td>
             <td class="actions">
                 ${isAdmin || isOwner ? `
                 <button class="btn-danger action-btn" onclick="deleteRecord(${record.id})">
