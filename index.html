@@ -449,6 +449,47 @@
         .settings-section {
             margin-bottom: 30px;
         }
+        /* أنماط صفحة الطالب */
+.student-profile {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--box-shadow);
+    margin-bottom: 30px;
+}
+
+.student-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    border-right: 4px solid var(--accent-color);
+}
+
+.btn-view {
+    background: var(--accent-color);
+    color: white;
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-view:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.memorization-records {
+    margin-top: 20px;
+}
+
+.memorization-records table {
+    width: 100%;
+    margin-top: 15px;
+}
         
         @media (max-width: 768px) {
             .form-grid {
@@ -1404,7 +1445,7 @@ function searchStudents() {
             <td>${student.group || '-'}</td>
             <td>${pagesCount}</td>
             <td class="actions">
-                <button class="btn-primary action-btn" onclick="exportStudentData('${student.id}')">
+                <button class="btn-primary action-btn" onclick="openStudentPage('${student.id}')">
                     <i class="fas fa-download"></i> تصدير
                 </button>
                 ${isOwner ? `
@@ -1586,7 +1627,11 @@ function saveSettings() {
             
             alert('تم تغيير كلمة المرور بنجاح');
         }
-        
+        // دالة لفتح صفحة الطالب
+function openStudentPage(studentId) {
+    // إنشاء رابط صفحة الطالب مع معلمة ID
+    window.location.href = `student_page.html?id=${studentId}`;
+}
         // عند تحميل الصفحة
         window.onload = function() {
             initSystem();
