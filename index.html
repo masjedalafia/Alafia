@@ -6,6 +6,8 @@
     <title>جامع العافية</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary-color: #1a5f7a;
@@ -45,32 +47,34 @@
             box-shadow: var(--box-shadow);
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .header::before {
-            content: "";
+        .logo {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('https://i.pinimg.com/originals/0e/0b/2c/0e0b2c0e4c8f8b8b8b8b8b8b8b8b8b8b.png') center/cover no-repeat;
-            opacity: 0.1;
-            z-index: 0;
+            top: 10px;
+            left: 10px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
         }
         
         .header h1 {
-            position: relative;
-            z-index: 1;
-            font-size: 2.5rem;
             margin: 0;
             padding: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         .header p {
-            position: relative;
-            z-index: 1;
             font-size: 1.2rem;
             margin: 10px 0 0;
             opacity: 0.9;
@@ -85,21 +89,6 @@
             text-align: center;
             font-size: 1.2rem;
             border-right: 5px solid var(--accent-color);
-        }
-        
-        .auth-section {
-            background: white;
-            padding: 30px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            max-width: 500px;
-            margin: 50px auto;
-            text-align: center;
-        }
-        
-        .auth-section h2 {
-            color: var(--primary-color);
-            margin-top: 0;
         }
         
         .tabs {
@@ -156,6 +145,12 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #eee;
             font-size: 1.8rem;
+        }
+        
+        h3 {
+            color: var(--primary-color);
+            margin-top: 20px;
+            font-size: 1.4rem;
         }
         
         .form-grid {
@@ -262,6 +257,22 @@
             background-color: #c0392b;
         }
         
+        .btn-view {
+            background: var(--accent-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-view:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
         .search-container {
             background: white;
             padding: 20px;
@@ -279,23 +290,14 @@
             flex: 1;
         }
         
-        /* أنماط الجدول الأساسية */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    box-shadow: var(--box-shadow);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-}
-
-/* التخصيص الجديد لعمود الصفحات */
-#recordsTable td:nth-child(3) {
-    direction: ltr;
-    text-align: left;
-    font-family: monospace;
-    white-space: nowrap;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
         
         th, td {
             padding: 15px;
@@ -458,47 +460,167 @@ table {
         .settings-section {
             margin-bottom: 30px;
         }
-        /* أنماط صفحة الطالب */
-.student-profile {
-    background: white;
-    border-radius: var(--border-radius);
-    padding: 20px;
-    box-shadow: var(--box-shadow);
-    margin-bottom: 30px;
-}
-
-.student-info {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: var(--border-radius);
-    margin-bottom: 20px;
-    border-right: 4px solid var(--accent-color);
-}
-
-.btn-view {
-    background: var(--accent-color);
-    color: white;
-    padding: 8px 15px;
-    border-radius: var(--border-radius);
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.3s ease;
-}
-
-.btn-view:hover {
-    background: var(--primary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.memorization-records {
-    margin-top: 20px;
-}
-
-.memorization-records table {
-    width: 100%;
-    margin-top: 15px;
-}
+        
+        .motivation-message {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            border-right: 5px solid var(--accent-color);
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .group-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background-color: rgba(21, 152, 149, 0.1);
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            margin: 5px;
+        }
+        
+        .alert {
+            padding: 10px;
+            border-radius: var(--border-radius);
+            margin: 10px 0;
+        }
+        
+        .alert-warning {
+            background-color: rgba(241, 196, 15, 0.2);
+            border-right: 3px solid var(--warning-color);
+            color: var(--warning-color);
+        }
+        
+        .student-page {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .student-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+        
+        .detail-item strong {
+            color: var(--primary-color);
+            margin-left: 5px;
+        }
+        
+        .back-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .input-error {
+            border-color: var(--danger-color) !important;
+        }
+        
+        .pages-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+        }
+        
+        .page-badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .stat-title {
+            font-size: 1.1rem;
+            color: var(--dark-color);
+        }
+        
+        .student-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-color);
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .photo-placeholder {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #ddd;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--accent-color);
+        }
+        
+        .photo-placeholder i {
+            font-size: 2rem;
+            color: #777;
+        }
         
         @media (max-width: 768px) {
             .form-grid {
@@ -546,209 +668,223 @@ table {
                 <select id="login-type" class="form-control" onchange="toggleLoginFields()">
                     <option value="student">طالب</option>
                     <option value="admin">مشرف</option>
+                    <option value="owner">مالك</option>
                 </select>
             </div>
             
             <div class="form-group" id="student-id-group">
                 <label for="student-id">رقم الطالب:</label>
-                <div class="input-icon">
-                    <i class="fas fa-id-card"></i>
-                    <input type="text" id="student-id" placeholder="أدخل رقم الطالب">
-                </div>
+                <input type="text" id="student-id" placeholder="أدخل رقم الطالب">
             </div>
             
-            <div class="form-group" id="admin-username-group" style="display: none;">
-                <label for="admin-username">اسم المستخدم:</label>
-                <div class="input-icon">
-                    <i class="fas fa-user"></i>
-                    <input type="text" id="admin-username" placeholder="أدخل اسم المستخدم">
-                </div>
+            <div class="form-group" id="admin-login-section" style="display: none;">
+                <label for="admin-username"><i class="fas fa-user"></i> اسم المستخدم:</label>
+                <input type="text" id="admin-username" placeholder="أدخل اسم المستخدم">
+                
+                <label for="admin-password"><i class="fas fa-lock"></i> كلمة المرور:</label>
+                <input type="password" id="admin-password" placeholder="أدخل كلمة المرور">
             </div>
             
-            <div class="form-group" id="admin-password-group" style="display: none;">
-                <label for="admin-password">كلمة المرور:</label>
-                <div class="input-icon">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="admin-password" placeholder="أدخل كلمة المرور">
-                </div>
+            <div class="buttons">
+                <button class="btn-primary" onclick="login()">
+                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                </button>
             </div>
-            
-            <button class="btn-primary" onclick="login()">
-                <i class="fas fa-sign-in-alt"></i> دخول
-            </button>
         </div>
     </div>
-    
     <div class="container" id="app-container" style="display: none;">
-        <button class="logout-btn" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-        </button>
-        
-        <div class="user-info" id="user-info">
-            <i class="fas fa-user"></i> <span id="username-display"></span>
-        </div>
-        
-        <div class="header">
+    <button class="logout-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+    </button>
+    
+    <div class="user-info" id="user-info">
+        <i class="fas fa-user"></i> <span id="username-display"></span>
+    </div>
+    
+    <div class="header">
+        <img id="system-logo" class="logo" src="" alt="الشعار">
+        <div class="header-content">
             <h1>جامع العافية</h1>
             <p>نظام متابعة حفظ القرآن الكريم وتقييم الطلاب</p>
         </div>
-        
-        <!-- رسالة الترحيب القابلة للتعديل -->
-        <div class="welcome-message" id="welcome-message">
-            <i class="fas fa-quote-right"></i>
-            <span id="welcome-text">مرحباً بكم في نظام جامع العافية لمتابعة حفظ القرآن الكريم</span>
-            <i class="fas fa-quote-left"></i>
-        </div>
-        
-        <div class="tabs">
-            <div class="tab active" onclick="showTab('records-tab')">
-                <i class="fas fa-list"></i> سجلات الحفظ
-            </div>
-            <div id="admin-tab" class="tab" onclick="showTab('entry-tab')" style="display: none;">
-                <i class="fas fa-plus-circle"></i> إدخال بيانات
-            </div>
-            <div id="management-tab" class="tab" onclick="showTab('management-tab')" style="display: none;">
-                <i class="fas fa-cog"></i> الإدارة
-            </div>
-        </div>
-        
-        <!-- تبويب إدخال البيانات (للمشرفين فقط) -->
-        <div id="entry-tab" class="tab-content">
-            <h2><i class="fas fa-book-open"></i> تسجيل صفحة جديدة</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="studentId">رقم الطالب:</label>
-                    <div class="input-icon">
-                        <i class="fas fa-id-card"></i>
-                        <input type="text" id="studentId" placeholder="أدخل رقم الطالب" onchange="loadStudentName()" onkeyup="loadStudentName()">
-                    </div>
-                </div>
-                
-                <div class="student-info" id="student-info" style="display: none;">
-                                    <h4>بيانات الطالب:</h4>
-                <p><strong>الاسم:</strong> <span id="display-student-name"></span></p>
-                <p><strong>المجموعة:</strong> <span id="display-student-group"></span></p>
-            </div>
-            
-            <input type="hidden" id="studentName">
-            
-            <div class="form-group">
-                <label for="pageNumber">رقم الصفحة:</label>
-                <div class="input-icon">
-                    <i class="fas fa-quran"></i>
-                    <input type="number" id="pageNumber" min="1" max="604" placeholder="من 1 إلى 604">
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="evaluation">تقييم الحفظ:</label>
-                <div class="input-icon">
-                    <i class="fas fa-star"></i>
-                    <select id="evaluation">
-                        <option value="">اختر التقييم</option>
-                        <option value="ممتاز">ممتاز</option>
-                        <option value="جيد جداً">جيد جداً</option>
-                        <option value="جيد">جيد</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="date">تاريخ الحفظ:</label>
-                <div class="input-icon">
-                    <i class="fas fa-calendar-alt"></i>
-                    <input type="date" id="date">
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="notes">ملاحظات:</label>
-                <textarea id="notes" rows="2" placeholder="أي ملاحظات إضافية"></textarea>
-            </div>
-        </div>
-        
-        <div class="buttons">
-            <button class="btn-secondary" onclick="clearForm()">
-                <i class="fas fa-eraser"></i> مسح النموذج
-            </button>
-            <button class="btn-primary" onclick="saveRecord()">
-                <i class="fas fa-save"></i> حفظ البيانات
-            </button>
-        </div>
     </div>
     
-    <!-- تبويب سجلات الحفظ -->
-    <div id="records-tab" class="tab-content active">
-        <h2><i class="fas fa-list-ol"></i> سجلات الحفظ</h2>
-        
-        <!-- خانة بحث خاصة بالطلاب -->
-        <div class="search-container" id="student-search-container" style="display: none;">
+    <div class="welcome-message" id="welcome-message">
+        <i class="fas fa-quote-right"></i>
+        <span id="welcome-text">مرحباً بكم في نظام جامع العافية لمتابعة حفظ القرآن الكريم</span>
+        <i class="fas fa-quote-left"></i>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('records-tab')">
+            <i class="fas fa-list"></i> سجلات الحفظ
+        </div>
+        <div id="admin-tab" class="tab" onclick="showTab('entry-tab')" style="display: none;">
+            <i class="fas fa-plus-circle"></i> إدخال بيانات
+        </div>
+        <div id="stats-tab" class="tab" onclick="showTab('stats-tab')" style="display: none;">
+            <i class="fas fa-chart-bar"></i> الإحصائيات
+        </div>
+        <div id="management-tab" class="tab" onclick="showTab('management-tab')" style="display: none;">
+            <i class="fas fa-cog"></i> الإدارة
+        </div>
+    </div>
+    <!-- تبويب إدخال البيانات -->
+<div id="entry-tab" class="tab-content">
+    <h2><i class="fas fa-book-open"></i> تسجيل صفحة جديدة</h2>
+    <div class="form-grid">
+        <div class="form-group">
+            <label for="studentId">رقم الطالب:</label>
             <div class="input-icon">
-                <i class="fas fa-search"></i>
-                <input type="text" id="student-search-input" placeholder="ابحث برقم الطالب..." disabled>
+                <i class="fas fa-id-card"></i>
+                <input type="text" id="studentId" placeholder="أدخل رقم الطالب" onchange="loadStudentName()">
             </div>
         </div>
         
-        <!-- خانة بحث للمشرفين -->
-        <div class="search-container" id="admin-search-container">
-            <div class="search-box">
-                <input type="text" id="search" placeholder="ابحث باسم الطالب، رقم الطالب أو رقم الصفحة...">
-                <button class="btn-primary" onclick="searchRecords()">
-                    <i class="fas fa-search"></i> بحث
-                </button>
-                <button class="btn-secondary" onclick="resetSearch()">
-                    <i class="fas fa-redo"></i> إعادة تعيين
-                </button>
+        <div class="student-info" id="student-info" style="display: none;">
+            <div id="student-photo-container" class="photo-placeholder">
+                <i class="fas fa-user"></i>
+            </div>
+            <h4>بيانات الطالب:</h4>
+            <p><strong>الاسم:</strong> <span id="display-student-name"></span></p>
+            <p><strong>المجموعة:</strong> <span id="display-student-group"></span></p>
+        </div>
+        
+        <input type="hidden" id="studentName">
+        
+        <div class="form-group">
+            <label for="pageNumber">رقم الصفحة:</label>
+            <div class="input-icon">
+                <i class="fas fa-quran"></i>
+                <input type="number" id="pageNumber" min="1" max="604" placeholder="من 1 إلى 604">
             </div>
         </div>
         
-        <table id="recordsTable">
-            <thead>
-                <tr>
-                    <th>صفحة الطالب</th>
-                    <th>رقم الطالب</th>
-                    <th>اسم الطالب</th>
-                    <th>الصفحات المحفوظة</th>
-                    <td><button onclick="exportStudentData('${studentId}')">تصدير</button></td>
-                    <th id="actions-header">الإجراءات</th>
-                </tr>
-            </thead>
-            <tbody>
-                <td>
-  <a href="student_page.html?id=${student.id}" class="btn-view">
-    <i class="fas fa-user"></i> صفحة الطالب
-  </a>
-</td>
-                <!-- سيتم ملء البيانات هنا عبر الجافاسكريبت -->
-            </tbody>
-        </table>
+        <div class="form-group">
+            <label for="evaluation">تقييم الحفظ:</label>
+            <div class="input-icon">
+                <i class="fas fa-star"></i>
+                <select id="evaluation">
+                    <option value="">اختر التقييم</option>
+                    <option value="ممتاز">ممتاز</option>
+                    <option value="جيد جداً">جيد جداً</option>
+                    <option value="جيد">جيد</option>
+                </select>
+            </div>
+        </div>
         
-        <div class="pagination">
-            <button class="page-btn"><i class="fas fa-angle-double-right"></i></button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn">2</button>
-            <button class="page-btn">3</button>
-            <button class="page-btn"><i class="fas fa-angle-double-left"></i></button>
+        <div class="form-group">
+            <label for="date">تاريخ الحفظ:</label>
+            <div class="input-icon">
+                <i class="fas fa-calendar-alt"></i>
+                <input type="date" id="date">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="notes">ملاحظات:</label>
+            <textarea id="notes" rows="2" placeholder="أي ملاحظات إضافية"></textarea>
         </div>
     </div>
     
-    <!-- تبويب الإدارة (للمالك والمشرفين) -->
-    <div id="management-tab" class="tab-content admin-only">
-        <!-- قسم إعدادات النظام -->
-        <div id="system-settings" class="admin-section settings-section">
-            <h2><i class="fas fa-cogs"></i> إعدادات النظام</h2>
-            <div class="form-group">
-                <label for="welcome-message-input">رسالة الترحيب:</label>
-                <textarea id="welcome-message-input" rows="3" placeholder="أدخل رسالة الترحيب التي تظهر في الصفحة الرئيسية"></textarea>
-            </div>
-            <button class="btn-primary" onclick="saveSettings()">
-                <i class="fas fa-save"></i> حفظ الإعدادات
+    <div class="buttons">
+        <button class="btn-secondary" onclick="clearForm()">
+            <i class="fas fa-eraser"></i> مسح النموذج
+        </button>
+        <button class="btn-primary" onclick="saveRecord()">
+            <i class="fas fa-save"></i> حفظ البيانات
+        </button>
+    </div>
+</div>
+<!-- تبويب سجلات الحفظ -->
+<div id="records-tab" class="tab-content active">
+    <h2><i class="fas fa-list-ol"></i> سجلات الحفظ</h2>
+    
+    <div class="search-container" id="student-search-container" style="display: none;">
+        <div class="input-icon">
+            <i class="fas fa-search"></i>
+            <input type="text" id="student-search-input" placeholder="ابحث برقم الطالب..." disabled>
+        </div>
+    </div>
+    
+    <div class="search-container" id="admin-search-container">
+        <div class="search-box">
+            <input type="text" id="search" placeholder="ابحث باسم الطالب، رقم الطالب أو رقم الصفحة...">
+            <button class="btn-primary" onclick="searchRecords()">
+                <i class="fas fa-search"></i> بحث
+            </button>
+            <button class="btn-secondary" onclick="resetSearch()">
+                <i class="fas fa-redo"></i> إعادة تعيين
             </button>
         </div>
-
-        <!-- قسم إدارة المشرفين (يظهر فقط للمالك) -->
-        <div id="admin-management" class="admin-section">
-            <h2><i class="fas fa-user-shield"></i> إدارة المشرفين</h2>
+    </div>
+    
+    <table id="recordsTable">
+        <thead>
+            <tr>
+                <th>رقم الطالب</th>
+                <th>اسم الطالب</th>
+                <th>الصفحات المحفوظة</th>
+                <th>صفحة الطالب</th>
+                <th id="actions-header">الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody id="recordsTableBody">
+            <!-- سيتم ملء البيانات هنا عبر الجافاسكريبت -->
+        </tbody>
+    </table>
+    
+    <div class="pagination">
+        <button class="page-btn"><i class="fas fa-angle-double-right"></i></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn"><i class="fas fa-angle-double-left"></i></button>
+    </div>
+</div>
+<!-- صفحة الطالب الداخلية -->
+<div id="student-page" class="student-page">
+    <div class="student-header">
+        <h2><i class="fas fa-user-graduate"></i> صفحة الطالب</h2>
+        <a href="#" class="back-btn" onclick="showTab('records-tab')">
+            <i class="fas fa-arrow-left"></i> العودة للسجلات
+        </a>
+    </div>
+    
+    <div class="student-details" id="student-details">
+        <!-- سيتم ملء بيانات الطالب هنا -->
+    </div>
+    
+    <h3><i class="fas fa-book-open"></i> سجل الحفظ</h3>
+    <table id="studentRecordsTable">
+        <thead>
+            <tr>
+                <th>رقم الصفحة</th>
+                <th>التقييم</th>
+                <th>التاريخ</th>
+                <th>ملاحظات</th>
+            </tr>
+        </thead>
+        <tbody id="studentRecordsBody">
+            <!-- سيتم ملء سجلات الطالب هنا -->
+        </tbody>
+    </table>
+    
+    <div class="buttons" style="margin-top: 20px;">
+        <button class="btn-primary" onclick="exportStudentData(currentStudentId, 'excel')">
+            <i class="fas fa-file-excel"></i> تصدير إكسل
+        </button>
+        <button class="btn-primary" onclick="exportStudentData(currentStudentId, 'pdf')">
+            <i class="fas fa-file-pdf"></i> تصدير PDF
+        </button>
+    </div>
+</div>
+<!-- تبويب الإدارة -->
+<div id="management-tab" class="tab-content admin-only">
+    <!-- قسم إدارة المشرفين -->
+    <div id="admin-management" class="admin-section">
+        <h2><i class="fas fa-user-shield"></i> إدارة المشرفين</h2>
+        <div class="form-grid">
             <div class="form-group">
                 <label for="new-admin-username">اسم المستخدم الجديد:</label>
                 <input type="text" id="new-admin-username" placeholder="اسم المستخدم للمشرف الجديد">
@@ -757,927 +893,1128 @@ table {
                 <label for="new-admin-password">كلمة المرور:</label>
                 <input type="password" id="new-admin-password" placeholder="كلمة مرور المشرف الجديد">
             </div>
-            <button class="btn-primary" onclick="addAdmin()">
-                <i class="fas fa-plus"></i> إضافة مشرف
-            </button>
-
-            <h3 style="margin-top: 20px;">قائمة المشرفين</h3>
-            <table id="admins-table">
-                <thead>
-                    <tr>
-                        <th>اسم المستخدم</th>
-                        <th>الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-
-        <!-- قسم إدارة الطلاب -->
-        <div id="students-management" class="admin-section">
-            <h2><i class="fas fa-users"></i> إدارة الطلاب</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="new-student-id">رقم الطالب:</label>
-                    <input type="text" id="new-student-id" placeholder="أدخل رقم الطالب">
-                </div>
-                <div class="form-group">
-                    <label for="new-student-name">اسم الطالب:</label>
-                    <input type="text" id="new-student-name" placeholder="أدخل اسم الطالب">
-                </div>
-                <div class="form-group">
-                    <label for="new-student-group">المجموعة:</label>
-                    <input type="text" id="new-student-group" placeholder="أدخل المجموعة">
-                </div>
-            </div>
-            <button class="btn-primary" onclick="addStudent()">
-                <i class="fas fa-user-plus"></i> إضافة طالب
-            </button>
-
-            <div class="export-options">
-                <button class="btn-primary" onclick="exportAllStudents()">
-                    <i class="fas fa-download"></i> تصدير جميع الطلاب
-                </button>
-                <button class="export-group-btn" onclick="exportSelectedStudents()">
-                    <i class="fas fa-download"></i> تصدير المحددين
-                </button>
-            </div>
-
-            <div class="search-container" style="margin-top: 20px;">
-                <input type="text" id="student-search" placeholder="ابحث عن طالب...">
-                <button class="btn-primary" onclick="searchStudents()">
-                    <i class="fas fa-search"></i> بحث
-                </button>
-            </div>
-
-            <table id="students-table">
-                <thead>
-                    <tr>
-                        <th>صفحة الطالب</th>
-                        <th>تحديد</th>
-                        <th>رقم الطالب</th>
-                        <th>اسم الطالب</th>
-                        <th>المجموعة</th>
-                        <th>عدد الصفحات المحفوظة</th>
-                        <th>الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <td>
-  <a href="student_page.html?id=${student.id}" class="btn-view">
-    <i class="fas fa-user"></i> صفحة الطالب
-  </a>
-</td>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- قسم تغيير كلمة المرور -->
-        <div id="change-password-section" class="admin-section">
-            <h2><i class="fas fa-key"></i> تغيير كلمة المرور</h2>
             <div class="form-group">
-                <label for="current-password">كلمة المرور الحالية:</label>
-                <input type="password" id="current-password" placeholder="أدخل كلمة المرور الحالية">
+                <label for="new-admin-group">المجموعة المسؤول عنها:</label>
+                <input type="text" id="new-admin-group" placeholder="أدخل اسم المجموعة">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>الصلاحيات:</label>
+            <div>
+                <input type="checkbox" id="perm-students">
+                <label for="perm-students">إدارة الطلاب</label>
+            </div>
+            <div>
+                <input type="checkbox" id="perm-pages">
+                <label for="perm-pages">إدخال الصفحات</label>
+            </div>
+            <div>
+                <input type="checkbox" id="perm-other-groups">
+                <label for="perm-other-groups">إضافة سجلات لطلاب من مجموعات أخرى</label>
+            </div>
+        </div>
+        
+        <button class="btn-primary" onclick="addAdmin()">
+            <i class="fas fa-plus"></i> إضافة مشرف
+        </button>
+        
+        <h3 style="margin-top: 20px;">قائمة المشرفين</h3>
+        <table id="admins-table">
+            <thead>
+                <tr>
+                    <th>اسم المستخدم</th>
+                    <th>المجموعة</th>
+                    <th>الصلاحيات</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="admins-table-body"></tbody>
+        </table>
+    </div>
+    
+    <!-- قسم إدارة الطلاب -->
+    <div id="students-management" class="admin-section">
+        <h2><i class="fas fa-users"></i> إدارة الطلاب</h2>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="new-student-id">رقم الطالب:</label>
+                <input type="text" id="new-student-id" placeholder="أدخل رقم الطالب">
             </div>
             <div class="form-group">
-                <label for="new-password">كلمة المرور الجديدة:</label>
-                <input type="password" id="new-password" placeholder="أدخل كلمة المرور الجديدة">
+                <label for="new-student-name">اسم الطالب:</label>
+                <input type="text" id="new-student-name" placeholder="أدخل اسم الطالب">
             </div>
             <div class="form-group">
-                <label for="confirm-password">تأكيد كلمة المرور:</label>
-                <input type="password" id="confirm-password" placeholder="أكد كلمة المرور الجديدة">
+                <label for="new-student-group">المجموعة:</label>
+                <input type="text" id="new-student-group" placeholder="أدخل المجموعة">
             </div>
-            <button class="btn-primary" onclick="changePassword()">
-                <i class="fas fa-save"></i> حفظ التغييرات
+            <div class="form-group">
+                <label for="new-student-photo">صورة الطالب:</label>
+                <input type="file" id="new-student-photo" accept="image/*">
+            </div>
+        </div>
+        <button class="btn-primary" onclick="addStudent()">
+            <i class="fas fa-user-plus"></i> إضافة طالب
+        </button>
+        
+        <div class="export-options">
+            <button class="btn-primary" onclick="exportAllStudents()">
+                <i class="fas fa-download"></i> تصدير جميع الطلاب
             </button>
         </div>
+        
+        <div class="search-container" style="margin-top: 20px;">
+            <input type="text" id="student-search" placeholder="ابحث عن طالب...">
+            <button class="btn-primary" onclick="searchStudents()">
+                <i class="fas fa-search"></i> بحث
+            </button>
+        </div>
+        
+        <table id="students-table">
+            <thead>
+                <tr>
+                    <th>صورة</th>
+                    <th>رقم الطالب</th>
+                    <th>اسم الطالب</th>
+                    <th>المجموعة</th>
+                    <th>عدد الصفحات المحفوظة</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="students-table-body"></tbody>
+        </table>
+    </div>
+        <!-- قسم الإحصائيات -->
+    <div id="stats-section" class="admin-section">
+        <h2><i class="fas fa-chart-pie"></i> الإحصائيات العامة</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="total-students">0</div>
+                <div class="stat-title">إجمالي الطلاب</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-pages">0</div>
+                <div class="stat-title">إجمالي الصفحات المحفوظة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-admins">0</div>
+                <div class="stat-title">عدد المشرفين</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-groups">0</div>
+                <div class="stat-title">عدد المجموعات</div>
+            </div>
+        </div>
+        
+        <h3>توزيع الطلاب على المجموعات</h3>
+        <canvas id="groups-chart" width="400" height="200"></canvas>
+    </div>
+    </div>
+    <!-- تبويب إعدادات النظام -->
+<div id="settings-tab" class="tab-content admin-only">
+    <div class="admin-section">
+        <h2><i class="fas fa-cogs"></i> إعدادات النظام</h2>
+        <div class="form-group">
+            <label for="welcome-message-input">رسالة الترحيب:</label>
+            <textarea id="welcome-message-input" rows="3" placeholder="أدخل رسالة الترحيب التي تظهر في الصفحة الرئيسية"></textarea>
+        </div>
+        
+        <h3>الرسائل التحفيزية</h3>
+        <div class="form-group">
+            <label for="motivation-messages">رسائل التحفيز (كل رسالة في سطر):</label>
+            <textarea id="motivation-messages" rows="5" placeholder="أدخل الرسائل التحفيزية..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="system-logo-input">شعار النظام:</label>
+            <input type="file" id="system-logo-input" accept="image/*">
+            <div id="logo-preview" style="margin-top: 10px;"></div>
+        </div>
+        
+        <button class="btn-primary" onclick="saveSettings()">
+            <i class="fas fa-save"></i> حفظ الإعدادات
+        </button>
     </div>
 </div>
+    </div>
 
-<script>
-    // متغيرات النظام
-    let currentUser = null;
-    let isOwner = false;
-    let isAdmin = false;
-    const APP_KEY = 'jame3alafia_system_v3';
-    
-    // تهيئة النظام
-    function initSystem() {
-        // جلب بيانات النظام من localStorage
-        if (!localStorage.getItem(APP_KEY)) {
-            // إنشاء بيانات أولية إذا لم توجد
-            const initialData = {
-                owner: {
-                    username: 'admin',
-                    password: 'admin123' // يجب تغييرها بعد التسجيل الأول
-                },
-                admins: [],
-                students: [],
-                records: [],
-                settings: {
-                    welcomeMessage: 'مرحباً بكم في نظام جامع العافية لمتابعة حفظ القرآن الكريم'
+    <script>
+        // متغيرات النظام
+        let currentUser = null;
+        let isOwner = false;
+        let isAdmin = false;
+        let currentStudentId = null;
+        const APP_KEY = 'jame3alafia_system_v5';
+        let loginAttempts = 0;
+        const MAX_LOGIN_ATTEMPTS = 3;
+        
+        // تهيئة النظام
+        function initSystem() {
+            if (!localStorage.getItem(APP_KEY)) {
+                const initialData = {
+                    owner: {
+                        username: 'admin',
+                        password: 'admin123',
+                        isOwner: true
+                    },
+                    admins: [
+                        {
+                            username: 'supervisor1',
+                            password: 'super123',
+                            group: 'المجموعة الأولى',
+                            permissions: ['students', 'pages']
+                        }
+                    ],
+                    students: [
+                        { id: '1001', name: 'عمر بن الخطاب', group: 'المجموعة الأولى', photo: null },
+                        { id: '1002', name: 'عثمان بن عفان', group: 'المجموعة الثانية', photo: null }
+                    ],
+                    records: [
+                        { id: 1, studentId: '1001', studentName: 'عمر بن الخطاب', pageNumber: '1', evaluation: 'ممتاز', date: '2023-10-15', notes: '', group: 'المجموعة الأولى' }
+                    ],
+                    settings: {
+                        welcomeMessage: 'مرحباً بكم في نظام جامع العافية لمتابعة حفظ القرآن الكريم',
+                        motivationMessages: [
+                            "حافظ على وردك اليومي ولا تتركه",
+                            "القرآن شفاء ونور، فاحرص على تلاوته"
+                        ],
+                        logo: null
+                    }
+                };
+                localStorage.setItem(APP_KEY, JSON.stringify(initialData));
+            }
+            
+            // تحميل الإعدادات
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            if (systemData.settings) {
+                document.getElementById('welcome-text').textContent = systemData.settings.welcomeMessage;
+                // تحميل الشعار إذا موجود
+                if (systemData.settings.logo) {
+                    document.getElementById('system-logo').src = systemData.settings.logo;
                 }
-            };
-            localStorage.setItem(APP_KEY, JSON.stringify(initialData));
-        }
-        
-        // تحميل رسالة الترحيب
-        const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-        if (systemData.settings && systemData.settings.welcomeMessage) {
-            document.getElementById('welcome-text').textContent = systemData.settings.welcomeMessage;
-        }
-        
-        // التحقق من تسجيل الدخول في الجلسة الحالية
-        const sessionUser = sessionStorage.getItem('currentUser');
-        if (sessionUser) {
-            currentUser = JSON.parse(sessionUser);
-            isOwner = currentUser.isOwner || false;
-            isAdmin = currentUser.isAdmin || false;
+            }
             
-            if (currentUser.isStudent) {
-                showStudentApp();
-            } else {
-                showApp();
+            // التحقق من تسجيل الدخول المسبق
+            const sessionUser = sessionStorage.getItem('currentUser');
+            if (sessionUser) {
+                currentUser = JSON.parse(sessionUser);
+                isOwner = currentUser.isOwner || false;
+                isAdmin = currentUser.isAdmin || false;
+                
+                if (currentUser.isStudent) {
+                    showStudentApp();
+                } else {
+                    showApp();
+                }
             }
         }
-    }
-    
-    // تبديل حقول تسجيل الدخول حسب نوع المستخدم
-    function toggleLoginFields() {
-        const loginType = document.getElementById('login-type').value;
-        
-        if (loginType === 'admin') {
+
+        // تبديل حقول تسجيل الدخول حسب نوع المستخدم
+        function toggleLoginFields() {
+            const loginType = document.getElementById('login-type').value;
+            
             document.getElementById('student-id-group').style.display = 'none';
-            document.getElementById('admin-username-group').style.display = 'block';
-            document.getElementById('admin-password-group').style.display = 'block';
-        } else {
-            document.getElementById('student-id-group').style.display = 'block';
-            document.getElementById('admin-username-group').style.display = 'none';
-            document.getElementById('admin-password-group').style.display = 'none';
-        }
-    }
-    
-    // وظيفة تسجيل الدخول
-    function login() {
-        const loginType = document.getElementById('login-type').value;
-        const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-        
-        if (loginType === 'admin') {
-            // تسجيل دخول مشرف أو مالك
-            const username = document.getElementById('admin-username').value;
-            const password = document.getElementById('admin-password').value;
+            document.getElementById('admin-login-section').style.display = 'none';
             
-            if (!username || !password) {
-                alert('الرجاء إدخال اسم المستخدم وكلمة المرور');
-                return;
-            }
-            
-            if (username === systemData.owner.username && password === systemData.owner.password) {
-                currentUser = { 
-                    username, 
-                    isOwner: true,
-                    isAdmin: true 
-                };
-                isOwner = true;
-                isAdmin = true;
-                
-                // حفظ حالة الجلسة
-                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-                showApp();
-                return;
-            }
-            
-            // التحقق من المشرفين
-            const admin = systemData.admins.find(a => a.username === username && a.password === password);
-            if (admin) {
-                currentUser = { 
-                    username, 
-                    isOwner: false,
-                    isAdmin: true 
-                };
-                isOwner = false;
-                isAdmin = true;
-                
-                // حفظ حالة الجلسة
-                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-                showApp();
-                return;
-            }
-            
-            alert('اسم المستخدم أو كلمة المرور غير صحيحة');
-        } else {
-            // تسجيل دخول طالب
-            const studentId = document.getElementById('student-id').value;
-            
-            if (!studentId) {
-                alert('الرجاء إدخال رقم الطالب');
-                return;
-            }
-            
-            const student = systemData.students.find(s => s.id === studentId);
-            
-            if (student) {
-                currentUser = { 
-                    username: student.name, 
-                    isStudent: true, 
-                    studentId: student.id 
-                };
-                
-                // حفظ حالة الجلسة
-                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-                showStudentApp();
-                return;
-            }
-            
-            alert('رقم الطالب غير مسجل في النظام');
-        }
-    }
-    
-    // عرض واجهة المشرف/المالك
-    function showApp() {
-        document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        document.getElementById('username-display').textContent = currentUser.username;
-        
-        // إظهار أقسام المالك فقط إذا كان مالكاً
-        if (isOwner) {
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-            document.getElementById('management-tab').style.display = 'block';
-            loadAdmins();
-        } else if (isAdmin) {
-            document.getElementById('admin-tab').style.display = 'block';
-            document.getElementById('management-tab').style.display = 'block';
-            document.getElementById('admin-management').style.display = 'none';
-        }
-        
-        // إعداد واجهة البحث
-        document.getElementById('student-search-container').style.display = 'none';
-        
-        
-        loadStudents();
-        displayRecords();
-    }
-    
-    function displayRecords(filteredRecords = null) {
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    const tableBody = document.querySelector('#recordsTable tbody');
-    tableBody.innerHTML = '';
-    
-    const recordsToDisplay = filteredRecords || systemData.records;
-    
-    if (recordsToDisplay.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="3" class="empty-state">
-                    <i class="fas fa-book-open"></i>
-                    <p>لا توجد سجلات مسجلة بعد</p>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-
-    // تجميع الصفحات حسب الطالب مع الترتيب
-    const studentsRecords = {};
-    recordsToDisplay.forEach(record => {
-        if (!studentsRecords[record.studentId]) {
-            studentsRecords[record.studentId] = {
-                name: record.studentName,
-                pages: []
-            };
-        }
-        studentsRecords[record.studentId].pages.push(parseInt(record.pageNumber));
-    });
-
-    // عرض البيانات المجمعة مع الترتيب
-    for (const studentId in studentsRecords) {
-        const student = studentsRecords[studentId];
-        student.pages.sort((a, b) => a - b); // ترتيب الصفحات تصاعدياً
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${studentId}</td>
-            <td>${student.name}</td>
-            <td>${student.pages.join('، ')}</td>
-        `;
-        tableBody.appendChild(row);
-    }
-}
-        
-        // إخفاء أقسام الإدارة
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-        document.getElementById('entry-tab').style.display = 'none';
-        document.getElementById('management-tab').style.display = 'none';
-        document.getElementById('admin-tab').style.display = 'none';
-        
-        // إعداد واجهة البحث
-        document.getElementById('student-search-container').style.display = 'block';
-        document.getElementById('admin-search-container').style.display = 'none';
-        document.getElementById('student-search-input').value = currentUser.studentId;
-        document.getElementById('student-search-input').disabled = true;
-        document.getElementById('actions-header').style.display = 'none';
-        
-        // عرض سجلات الطالب فقط
-        displayStudentRecords(currentUser.studentId);
-    }
-    
-    // تسجيل الخروج
-    function logout() {
-        currentUser = null;
-        isOwner = false;
-        isAdmin = false;
-        sessionStorage.removeItem('currentUser');
-        
-        document.getElementById('app-container').style.display = 'none';
-        document.getElementById('auth-container').style.display = 'block';
-        
-        // إعادة تعيين حقول تسجيل الدخول
-        document.getElementById('login-type').value = 'student';
-        document.getElementById('student-id').value = '';
-        document.getElementById('admin-username').value = '';
-        document.getElementById('admin-password').value = '';
-        toggleLoginFields();
-    }
-    
-    // عرض تبويب معين
-    function showTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.style.display = 'none';
-            tab.classList.remove('active');
-        });
-        
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        
-        document.getElementById(tabId).style.display = 'block';
-        document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
-        
-        // تحديث البيانات عند عرض التبويب
-        if (tabId === 'records-tab') {
-            if (currentUser.isStudent) {
-                displayStudentRecords(currentUser.studentId);
+            if (loginType === 'student') {
+                document.getElementById('student-id-group').style.display = 'block';
             } else {
-                displayRecords();
+                document.getElementById('admin-login-section').style.display = 'block';
             }
-        } else if (tabId === 'management-tab') {
+        }
+
+        // التحقق من صحة بيانات تسجيل الدخول
+        function validateLoginFields() {
+            const loginType = document.getElementById('login-type').value;
+            let isValid = true;
+            
+            // إزالة رسائل الخطأ السابقة
+            document.querySelectorAll('.error-message').forEach(el => el.remove());
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+            
+            if (loginType === 'student') {
+                const studentId = document.getElementById('student-id').value.trim();
+                if (!studentId) {
+                    showError('رقم الطالب مطلوب', 'student-id');
+                    isValid = false;
+                }
+            } else {
+                const username = document.getElementById('admin-username').value.trim();
+                const password = document.getElementById('admin-password').value.trim();
+                
+                if (!username) {
+                    showError('اسم المستخدم مطلوب', 'admin-username');
+                    isValid = false;
+                }
+                
+                if (!password) {
+                    showError('كلمة المرور مطلوبة', 'admin-password');
+                    isValid = false;
+                } else if (password.length < 6) {
+                    showError('كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'admin-password');
+                    isValid = false;
+                }
+            }
+            
+            return isValid;
+        }
+
+        // عرض رسالة خطأ
+        function showError(message, elementId) {
+            const element = document.getElementById(elementId);
+            element.classList.add('input-error');
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            
+            element.parentNode.appendChild(errorDiv);
+        }
+
+        // تسجيل الدخول
+        function login() {
+            if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+                alert('لقد تجاوزت عدد المحاولات المسموحة، يرجى المحاولة لاحقاً');
+                return;
+            }
+            
+            if (!validateLoginFields()) {
+                return;
+            }
+            
+            const loginType = document.getElementById('login-type').value;
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            
+            try {
+                if (loginType === 'owner') {
+                    const username = document.getElementById('admin-username').value.trim();
+                    const password = document.getElementById('admin-password').value.trim();
+                    
+                    if (username === systemData.owner.username && password === systemData.owner.password) {
+                        currentUser = {
+                            username,
+                            isOwner: true,
+                            isAdmin: true,
+                            permissions: ['all']
+                        };
+                        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        showApp();
+                        return;
+                    }
+                    throw new Error('بيانات المالك غير صحيحة');
+                }
+                else if (loginType === 'admin') {
+                    const username = document.getElementById('admin-username').value.trim();
+                    const password = document.getElementById('admin-password').value.trim();
+                    
+                    const admin = systemData.admins.find(a => a.username === username);
+                    if (!admin) {
+                        throw new Error('اسم المستخدم غير موجود');
+                    }
+                    
+                    if (admin.password !== password) {
+                        throw new Error('كلمة المرور غير صحيحة');
+                    }
+                    
+                    currentUser = {
+                        username: admin.username,
+                        isOwner: false,
+                        isAdmin: true,
+                        group: admin.group,
+                        permissions: admin.permissions || []
+                    };
+                    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showApp();
+                    return;
+                }
+                else {
+                    // تسجيل دخول الطالب
+                    const studentId = document.getElementById('student-id').value.trim();
+                    const student = systemData.students.find(s => s.id === studentId);
+                    
+                    if (student) {
+                        currentUser = { 
+                            username: student.name, 
+                            isStudent: true, 
+                            studentId: student.id,
+                            group: student.group
+                        };
+                        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        showStudentApp();
+                        return;
+                    }
+                    throw new Error('رقم الطالب غير مسجل في النظام');
+                }
+            } catch (error) {
+                loginAttempts++;
+                const remaining = MAX_LOGIN_ATTEMPTS - loginAttempts;
+                
+                if (remaining > 0) {
+                    alert(`${error.message} (تبقى ${remaining} محاولة)`);
+                } else {
+                    alert('لقد استنفذت جميع محاولات الدخول، النظام مغلق مؤقتاً');
+                    disableLoginForm();
+                }
+            }
+        }
+
+        // تعطيل نموذج تسجيل الدخول
+        function disableLoginForm() {
+            document.getElementById('admin-username').disabled = true;
+            document.getElementById('admin-password').disabled = true;
+            document.querySelector('.btn-primary').disabled = true;
+            
+            setTimeout(() => {
+                loginAttempts = 0;
+                document.getElementById('admin-username').disabled = false;
+                document.getElementById('admin-password').disabled = false;
+                document.querySelector('.btn-primary').disabled = false;
+            }, 300000); // 5 دقائق
+        }
+
+        // عرض واجهة التطبيق الرئيسية
+        function showApp() {
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            document.getElementById('username-display').textContent = currentUser.username;
+            
+            // إظهار الأقسام حسب الصلاحيات
             if (isOwner) {
-                loadAdmins();
-                loadSettings();
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+                document.getElementById('management-tab').style.display = 'block';
+                document.getElementById('stats-tab').style.display = 'block';
+            } 
+            else if (isAdmin) {
+                document.getElementById('admin-tab').style.display = 'block';
+                document.getElementById('stats-tab').style.display = 'block';
+                document.getElementById('management-tab').style.display = 'none';
             }
-            loadStudents();
-        }
-    }
-    
-    // تحميل اسم الطالب عند إدخال رقمه
-    function loadStudentName() {
-        const studentId = document.getElementById('studentId').value;
-        if (!studentId) {
-                    document.getElementById('studentName').value = '';
-        return;
-    }
-    
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    const student = systemData.students.find(s => s.id === studentId);
-    
-    if (student) {
-        document.getElementById('student-info').style.display = 'block';
-        document.getElementById('display-student-name').textContent = student.name;
-        document.getElementById('display-student-group').textContent = student.group || 'غير محدد';
-        document.getElementById('studentName').value = student.name;
-    } else {
-        document.getElementById('student-info').style.display = 'none';
-        document.getElementById('studentName').value = '';
-        
-        if (confirm('رقم الطالب غير مسجل. هل تريد إضافة هذا الطالب جديد؟')) {
-            const name = prompt('أدخل اسم الطالب:');
-            if (name) {
-                const group = prompt('أدخل المجموعة (اختياري):') || '';
-                systemData.students.push({
-                    id: studentId,
-                    name: name,
-                    group: group
-                });
-                localStorage.setItem(APP_KEY, JSON.stringify(systemData));
-                loadStudentName(); // إعادة تحميل البيانات بعد الإضافة
+            
+            // إعداد واجهة البحث
+            document.getElementById('student-search-container').style.display = 'none';
+            document.getElementById('admin-search-container').style.display = 'block';
+            
+            // عرض رسالة المجموعة للمشرف
+            if (currentUser.group) {
+                const groupMessage = document.createElement('div');
+                groupMessage.className = 'motivation-message';
+                groupMessage.innerHTML = `
+                    <i class="fas fa-users"></i>
+                    أنت مشرف على: <span class="group-badge">${currentUser.group}</span>
+                `;
+                document.getElementById('welcome-message').appendChild(groupMessage);
             }
-        }
-    }
-}
-
-// حفظ السجل الجديد
-function saveRecord() {
-    const studentId = document.getElementById('studentId').value;
-    const studentName = document.getElementById('studentName').value;
-    const pageNumber = document.getElementById('pageNumber').value;
-    const evaluation = document.getElementById('evaluation').value;
-    const date = document.getElementById('date').value;
-    const notes = document.getElementById('notes').value;
-    
-    if (!studentId || !pageNumber || !evaluation || !date) {
-        alert('الرجاء ملء جميع الحقول المطلوبة');
-        return;
-    }
-    
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    
-    // إضافة السجل الجديد
-    const record = {
-        id: Date.now(),
-        studentId,
-        studentName,
-        pageNumber,
-        evaluation,
-        date,
-        notes,
-        addedBy: currentUser.username,
-        addedAt: new Date().toISOString()
-    };
-    
-    systemData.records.push(record);
-    localStorage.setItem(APP_KEY, JSON.stringify(systemData));
-    
-    alert('تم حفظ السجل بنجاح');
-    clearForm();
-    displayRecords();
-}
-
-// مسح النموذج
-function clearForm() {
-    document.getElementById('studentId').value = '';
-    document.getElementById('studentName').value = '';
-    document.getElementById('pageNumber').value = '';
-    document.getElementById('evaluation').value = '';
-    document.getElementById('date').value = '';
-    document.getElementById('notes').value = '';
-    document.getElementById('student-info').style.display = 'none';
-}
-
-// عرض السجلات
-function displayRecords(filteredRecords = null) {
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    const tableBody = document.querySelector('#recordsTable tbody');
-    tableBody.innerHTML = '';
-    
-    const recordsToDisplay = filteredRecords || systemData.records;
-    
-    if (recordsToDisplay.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="empty-state">
-                    <i class="fas fa-book-open"></i>
-                    <p>لا توجد سجلات مسجلة بعد</p>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    // ترتيب السجلات من الأحدث إلى الأقدم
-    const sortedRecords = [...recordsToDisplay].sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    sortedRecords.forEach(record => {
-        let evaluationBadge = '';
-        if (record.evaluation === 'ممتاز') {
-            evaluationBadge = `<span class="status-badge status-excellent">ممتاز</span>`;
-        } else if (record.evaluation === 'جيد جداً') {
-            evaluationBadge = `<span class="status-badge status-very-good">جيد جداً</span>`;
-        } else if (record.evaluation === 'جيد') {
-            evaluationBadge = `<span class="status-badge status-good">جيد</span>`;
-        }
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${record.studentId}</td>
-            <td>${record.studentName}</td>
-            <td>${record.pageNumber}</td>
-            <td class="actions">
-                ${isAdmin || isOwner ? `
-                <button class="btn-danger action-btn" onclick="deleteRecord(${record.id})">
-                    <i class="fas fa-trash"></i> حذف
-                </button>
-                ` : ''}
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
-}
-
-// عرض سجلات طالب معين
-function displayStudentRecords(studentId) {
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    const studentRecords = systemData.records.filter(r => r.studentId === studentId);
-    displayRecords(studentRecords);
-}
-
-// البحث في السجلات
-function searchRecords() {
-    const searchTerm = document.getElementById('search').value.toLowerCase();
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    
-    const filteredRecords = systemData.records.filter(record => 
-        record.studentId.includes(searchTerm) ||
-        record.studentName.toLowerCase().includes(searchTerm) ||
-        record.pageNumber.toString().includes(searchTerm) ||
-        record.evaluation.toLowerCase().includes(searchTerm)
-    );
-    
-    displayRecords(filteredRecords);
-}
-
-// إعادة تعيين البحث
-function resetSearch() {
-    document.getElementById('search').value = '';
-    displayRecords();
-}
-
-// حذف سجل
-function deleteRecord(recordId) {
-    if (!confirm('هل أنت متأكد من حذف هذا السجل؟')) return;
-    
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    systemData.records = systemData.records.filter(r => r.id !== recordId);
-    localStorage.setItem(APP_KEY, JSON.stringify(systemData));
-    
-    displayRecords();
-    alert('تم حذف السجل بنجاح');
-}
-
-// إضافة مشرف جديد
-function addAdmin() {
-    if (!isOwner) return;
-    
-    const username = document.getElementById('new-admin-username').value;
-    const password = document.getElementById('new-admin-password').value;
-    
-    if (!username || !password) {
-        alert('الرجاء إدخال اسم المستخدم وكلمة المرور');
-        return;
-    }
-    
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    
-    // التحقق من عدم وجود مستخدم بنفس الاسم
-    if (systemData.admins.some(a => a.username === username)) {
-        alert('اسم المستخدم موجود بالفعل');
-        return;
-    }
-    
-    systemData.admins.push({ username, password });
-    localStorage.setItem(APP_KEY, JSON.stringify(systemData));
-    
-    alert('تمت إضافة المشرف بنجاح');
-    loadAdmins();
-    
-    // مسح الحقول
-    document.getElementById('new-admin-username').value = '';
-    document.getElementById('new-admin-password').value = '';
-}
-
-// حذف مشرف
-function removeAdmin(username) {
-    if (!isOwner) return;
-    
-    if (!confirm('هل أنت متأكد من حذف هذا المشرف؟')) return;
-    
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    systemData.admins = systemData.admins.filter(a => a.username !== username);
-    localStorage.setItem(APP_KEY, JSON.stringify(systemData));
-    
-    loadAdmins();
-    alert('تم حذف المشرف بنجاح');
-}
-
-// تحميل قائمة المشرفين
-function loadAdmins() {
-    if (!isOwner) return;
-    
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    const tableBody = document.querySelector('#admins-table tbody');
-    tableBody.innerHTML = '';
-    
-    systemData.admins.forEach(admin => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${admin.username}</td>
-            <td class="actions">
-                <button class="btn-danger action-btn" onclick="removeAdmin('${admin.username}')">
-                    <i class="fas fa-trash"></i> حذف
-                </button>
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
-}
-
-// إضافة طالب جديد
-function addStudent() {
-    const id = document.getElementById('new-student-id').value;
-    const name = document.getElementById('new-student-name').value;
-    const group = document.getElementById('new-student-group').value;
-    
-    if (!id || !name) {
-        alert('الرجاء إدخال رقم الطالب والاسم');
-        return;
-    }
-    
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    
-    // التحقق من عدم وجود طالب بنفس الرقم
-    if (systemData.students.some(s => s.id === id)) {
-        alert('رقم الطالب موجود بالفعل');
-        return;
-    }
-    
-    systemData.students.push({ id, name, group });
-    localStorage.setItem(APP_KEY, JSON.stringify(systemData));
-    
-    alert('تمت إضافة الطالب بنجاح');
-    loadStudents();
-    
-    // مسح الحقول
-    document.getElementById('new-student-id').value = '';
-    document.getElementById('new-student-name').value = '';
-    document.getElementById('new-student-group').value = '';
-}
-
-
-// تحميل قائمة الطلاب
-function loadStudents() {
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    const tableBody = document.querySelector('#students-table tbody');
-    tableBody.innerHTML = '';
-    
-    systemData.students.forEach(student => {
-        const pagesCount = systemData.records.filter(r => r.studentId === student.id).length;
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><input type="checkbox" class="student-checkbox" value="${student.id}"></td>
-            <td>${student.id}</td>
-            <td>${student.name}</td>
-            <td>${student.group || '-'}</td>
-            <td>${pagesCount}</td>
-            <td class="actions">
-                <button class="btn-primary action-btn" onclick="exportStudentData('${student.id}')">
-                    <i class="fas fa-download"></i> تصدير
-                </button>
-                ${isOwner ? `
-                <button class="btn-danger action-btn" onclick="removeStudent('${student.id}')">
-                    <i class="fas fa-trash"></i> حذف
-                </button>
-                ` : ''}
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
-}
-
-// البحث عن الطلاب
-function searchStudents() {
-    const searchTerm = document.getElementById('student-search').value.toLowerCase();
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    const tableBody = document.querySelector('#students-table tbody');
-    tableBody.innerHTML = '';
-    
-    const filteredStudents = systemData.students.filter(student => 
-        student.id.includes(searchTerm) ||
-        student.name.toLowerCase().includes(searchTerm) ||
-        (student.group && student.group.toLowerCase().includes(searchTerm))
-    );
-    
-    if (filteredStudents.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="6" class="empty-state">
-                    <i class="fas fa-search"></i>
-                    <p>لا توجد نتائج مطابقة للبحث</p>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    filteredStudents.forEach(student => {
-        const pagesCount = systemData.records.filter(r => r.studentId === student.id).length;
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><input type="checkbox" class="student-checkbox" value="${student.id}"></td>
-            <td>${student.id}</td>
-            <td>${student.name}</td>
-            <td>${student.group || '-'}</td>
-            <td>${pagesCount}</td>
-            <td class="actions">
-                <button class="btn-primary action-btn" onclick="openStudentPage('${student.id}')">
-                    <i class="fas fa-download"></i> تصدير
-                </button>
-                ${isOwner ? `
-                <button class="btn-danger action-btn" onclick="removeStudent('${student.id}')">
-                    <i class="fas fa-trash"></i> حذف
-                </button>
-                ` : ''}
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
-}
-
-// تصدير بيانات طالب واحد
-function exportStudentData(studentId) {
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    const student = systemData.students.find(s => s.id === studentId);
-    if (!student) return;
-
-    // ترتيب السجلات حسب رقم الصفحة تصاعدياً
-    const studentRecords = systemData.records
-        .filter(r => r.studentId === studentId)
-        .sort((a, b) => a.pageNumber - b.pageNumber);
-
-    // تنسيق CSV مع إضافة رأس الملف
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += `اسم الطالب,${student.name}\n`;
-    csvContent += `رقم الطالب,${student.id}\n`;
-    csvContent += `المجموعة,${student.group || 'غير محدد'}\n\n`;
-
-    // عناوين الأعمدة
-    csvContent += "رقم الصفحة,التقييم,التاريخ,الملاحظات\n";
-
-    // بيانات السجلات (مرتبة ومهيأة للتصدير)
-    studentRecords.forEach(record => {
-        csvContent += [
-            record.pageNumber,
-            record.evaluation,
-            record.date,
-            `"${record.notes || ''}"` // وضع الملاحظات بين "" لتجنب مشاكل الفواصل
-        ].join(',') + '\n';
-    });
-
-    // تنزيل الملف
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `سجل_حفظ_${student.name}_${student.id}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// تصدير جميع الطلاب
-function exportAllStudents() {
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    exportStudentsData(systemData.students);
-}
-
-// تصدير الطلاب المحددين
-function exportSelectedStudents() {
-    const checkboxes = document.querySelectorAll('.student-checkbox:checked');
-    if (checkboxes.length === 0) {
-        alert('لم يتم تحديد أي طلاب');
-        return;
-    }
-    
-    const selectedIds = Array.from(checkboxes).map(cb => cb.value);
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    const selectedStudents = systemData.students.filter(s => selectedIds.includes(s.id));
-    
-    exportStudentsData(selectedStudents);
-}
-
-// تصدير بيانات مجموعة طلاب
-function exportStudentsData(students) {
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    
-    let csvContent = "data:text/csv;charset=utf-8,";
-    
-    // عنوان الملف
-    csvContent += `سجل حفظ الطلاب - ${new Date().toLocaleDateString()}\n\n`;
-    
-    students.forEach(student => {
-        const studentRecords = systemData.records.filter(r => r.studentId === student.id);
-        
-        if (studentRecords.length > 0) {
-            // بيانات الطالب
-            csvContent += `الطالب: ${student.name}\n`;
-            csvContent += `رقم الطالب: ${student.id}\n`;
-            csvContent += `المجموعة: ${student.group || 'غير محدد'}\n`;
-            csvContent += `عدد الصفحات المحفوظة: ${studentRecords.length}\n\n`;
             
-            // عناوين الأعمدة
-            csvContent += "رقم الصفحة,التقييم,التاريخ,الملاحظات\n";
+            displayRecords();
+        }
+
+        // عرض واجهة الطالب
+        function showStudentApp() {
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            document.getElementById('username-display').textContent = currentUser.username;
             
-            // بيانات السجلات
-            studentRecords.forEach(record => {
-                csvContent += `${record.pageNumber},${record.evaluation},${record.date},${record.notes || ''}\n`;
+            // إخفاء أقسام الإدارة
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+            document.getElementById('entry-tab').style.display = 'none';
+            document.getElementById('management-tab').style.display = 'none';
+            document.getElementById('admin-tab').style.display = 'none';
+            document.getElementById('stats-tab').style.display = 'none';
+            
+            // إعداد واجهة البحث
+            document.getElementById('student-search-container').style.display = 'block';
+            document.getElementById('admin-search-container').style.display = 'none';
+            document.getElementById('student-search-input').value = currentUser.studentId;
+            document.getElementById('student-search-input').disabled = true;
+            document.getElementById('actions-header').style.display = 'none';
+            
+            // عرض رسالة المجموعة للطالب
+            if (currentUser.group) {
+                const groupMessage = document.createElement('div');
+                groupMessage.className = 'motivation-message';
+                groupMessage.innerHTML = `
+                    <i class="fas fa-user-graduate"></i>
+                    أنت في: <span class="group-badge">${currentUser.group}</span>
+                `;
+                document.getElementById('welcome-message').appendChild(groupMessage);
+            }
+            
+            displayStudentRecords(currentUser.studentId);
+        }
+
+        // تسجيل الخروج
+        function logout() {
+            currentUser = null;
+            isOwner = false;
+            isAdmin = false;
+            sessionStorage.removeItem('currentUser');
+            
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('auth-container').style.display = 'block';
+            
+            // إعادة تعيين حقول تسجيل الدخول
+            document.getElementById('login-type').value = 'student';
+            document.getElementById('student-id').value = '';
+            document.getElementById('admin-username').value = '';
+            document.getElementById('admin-password').value = '';
+            toggleLoginFields();
+        }
+
+        // عرض تبويب معين
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+                tab.classList.remove('active');
             });
             
-            csvContent += "\n\n";
-        }
-    });
-    
-    // إنشاء الرابط وتنزيل الملف
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `سجل_حفظ_الطلاب_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// تحميل الإعدادات
-function loadSettings() {
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    if (systemData.settings) {
-        document.getElementById('welcome-message-input').value = systemData.settings.welcomeMessage || '';
-    }
-}
-
-// حفظ الإعدادات
-function saveSettings() {
-    const welcomeMessage = document.getElementById('welcome-message-input').value;
-    
-    const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-    
-    if (!systemData.settings) {
-        systemData.settings = {};
-    }
-    
-    systemData.settings.welcomeMessage = welcomeMessage;
-    localStorage.setItem(APP_KEY, JSON.stringify(systemData));
-    
-                // تحديث رسالة الترحيب مباشرة
-            document.getElementById('welcome-text').textContent = welcomeMessage;
-            alert('تم حفظ الإعدادات بنجاح');
-        }
-        
-        // تغيير كلمة المرور
-        function changePassword() {
-            if (!currentUser) return;
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
             
-            const currentPass = document.getElementById('current-password').value;
-            const newPass = document.getElementById('new-password').value;
-            const confirmPass = document.getElementById('confirm-password').value;
+            document.getElementById(tabId).style.display = 'block';
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
             
-            if (!currentPass || !newPass || !confirmPass) {
-                alert('الرجاء إدخال جميع الحقول');
-                return;
+            // تحديث البيانات عند عرض التبويب
+            if (tabId === 'records-tab') {
+                if (currentUser.isStudent) {
+                    displayStudentRecords(currentUser.studentId);
+                } else {
+                    displayRecords();
+                }
+            } else if (tabId === 'management-tab') {
+                if (isOwner) {
+                    loadAdmins();
+                    loadStudents();
+                    updateStats();
+                }
+            } else if (tabId === 'stats-tab') {
+                updateStats();
+            } else if (tabId === 'settings-tab') {
+                loadSettings();
             }
-            
-            if (newPass !== confirmPass) {
-                alert('كلمة المرور الجديدة غير متطابقة');
+        }
+
+        // تحميل اسم الطالب عند إدخال رقمه
+        function loadStudentName() {
+            const studentId = document.getElementById('studentId').value;
+            if (!studentId) {
+                document.getElementById('studentName').value = '';
                 return;
             }
             
             const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            const student = systemData.students.find(s => s.id === studentId);
             
-            if (isOwner) {
-                if (currentPass !== systemData.owner.password) {
-                    alert('كلمة المرور الحالية غير صحيحة');
-                    return;
+            if (student) {
+                document.getElementById('student-info').style.display = 'block';
+                document.getElementById('display-student-name').textContent = student.name;
+                document.getElementById('display-student-group').textContent = student.group || 'غير محدد';
+                document.getElementById('studentName').value = student.name;
+                
+                // تحميل صورة الطالب
+                const container = document.getElementById('student-photo-container');
+                if (student.photo) {
+                    container.innerHTML = `<img src="${student.photo}" alt="صورة الطالب" class="student-photo">`;
+                } else {
+                    container.innerHTML = '<i class="fas fa-user"></i>';
                 }
                 
-                systemData.owner.password = newPass;
+                // إظهار تحذير إذا كان الطالب من مجموعة أخرى
+                if (isAdmin && student.group !== currentUser.group && 
+                    !currentUser.permissions.includes('other-groups')) {
+                    const warning = document.createElement('div');
+                    warning.className = 'alert alert-warning';
+                    warning.innerHTML = `
+                        <i class="fas fa-exclamation-triangle"></i>
+                        تنبيه: هذا الطالب من مجموعة ${student.group} وليس من مجموعتك
+                    `;
+                    document.getElementById('student-info').appendChild(warning);
+                }
             } else {
-                // تغيير كلمة مرور مشرف
-                const adminIndex = systemData.admins.findIndex(a => a.username === currentUser.username);
-                if (adminIndex === -1 || systemData.admins[adminIndex].password !== currentPass) {
-                    alert('كلمة المرور الحالية غير صحيحة');
-                    return;
-                }
+                document.getElementById('student-info').style.display = 'none';
+                document.getElementById('studentName').value = '';
                 
-                systemData.admins[adminIndex].password = newPass;
+                if (confirm('رقم الطالب غير مسجل. هل تريد إضافة هذا الطالب جديد؟')) {
+                    const name = prompt('أدخل اسم الطالب:');
+                    if (name) {
+                        const group = prompt('أدخل المجموعة (اختياري):') || '';
+                        systemData.students.push({
+                            id: studentId,
+                            name: name,
+                            group: group,
+                            photo: null
+                        });
+                        localStorage.setItem(APP_KEY, JSON.stringify(systemData));
+                        loadStudentName();
+                    }
+                }
+            }
+        }
+
+        // حفظ السجل الجديد
+        function saveRecord() {
+            const studentId = document.getElementById('studentId').value;
+            const studentName = document.getElementById('studentName').value;
+            const pageNumber = document.getElementById('pageNumber').value;
+            const evaluation = document.getElementById('evaluation').value;
+            const date = document.getElementById('date').value;
+            const notes = document.getElementById('notes').value;
+            
+            if (!studentId || !pageNumber || !evaluation || !date) {
+                alert('الرجاء ملء جميع الحقول المطلوبة');
+                return;
             }
             
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            const student = systemData.students.find(s => s.id === studentId);
+            
+            // التحقق من صلاحيات المشرف
+            if (isAdmin && !currentUser.permissions.includes('other-groups')) {
+                if (student && student.group !== currentUser.group) {
+                    if (!confirm('هذا الطالب ليس من مجموعتك. هل تريد إضافة السجل مع ذلك؟')) {
+                        return;
+                    }
+                }
+            }
+            
+            // إضافة السجل الجديد
+            const record = {
+                id: Date.now(),
+                studentId,
+                studentName,
+                pageNumber,
+                evaluation,
+                date,
+                notes,
+                group: student?.group || 'غير محدد',
+                addedBy: currentUser.username,
+                addedAt: new Date().toISOString()
+            };
+            
+            systemData.records.push(record);
             localStorage.setItem(APP_KEY, JSON.stringify(systemData));
             
-            // مسح الحقول
-            document.getElementById('current-password').value = '';
-            document.getElementById('new-password').value = '';
-            document.getElementById('confirm-password').value = '';
-            
-            alert('تم تغيير كلمة المرور بنجاح');
+            alert('تم حفظ السجل بنجاح');
+            clearForm();
+            displayRecords();
         }
-        // دالة لفتح صفحة الطالب
-function openStudentPage(studentId) {
-    // إنشاء رابط صفحة الطالب مع معلمة ID
-    window.location.href = `student_page.html?id=${studentId}`;
-}
+
+        // مسح النموذج
+        function clearForm() {
+            document.getElementById('studentId').value = '';
+            document.getElementById('studentName').value = '';
+            document.getElementById('pageNumber').value = '';
+            document.getElementById('evaluation').value = '';
+            document.getElementById('date').value = '';
+            document.getElementById('notes').value = '';
+            document.getElementById('student-info').style.display = 'none';
+        }
+
+        // عرض السجلات
+        function displayRecords(filteredRecords = null) {
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            const tableBody = document.querySelector('#recordsTableBody');
+            tableBody.innerHTML = '';
+            
+            let recordsToDisplay = filteredRecords || systemData.records;
+            
+            // إذا كان مشرفاً، يعرض فقط سجلات مجموعته
+            if (isAdmin && currentUser.group && !currentUser.permissions.includes('other-groups')) {
+                recordsToDisplay = recordsToDisplay.filter(r => r.group === currentUser.group);
+            }
+            
+            // تجميع الصفحات حسب الطالب مع الترتيب
+            const studentsRecords = {};
+            recordsToDisplay.forEach(record => {
+                if (!studentsRecords[record.studentId]) {
+                    studentsRecords[record.studentId] = {
+                        name: record.studentName,
+                        group: record.group || 'غير محدد',
+                        pages: []
+                    };
+                }
+                studentsRecords[record.studentId].pages.push(parseInt(record.pageNumber));
+            });
+            
+            // ترتيب الصفحات تصاعدياً لكل طالب
+            Object.keys(studentsRecords).forEach(studentId => {
+                studentsRecords[studentId].pages.sort((a, b) => a - b);
+            });
+            
+            // عرض البيانات المجمعة مع الترتيب
+            if (Object.keys(studentsRecords).length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <i class="fas fa-book-open"></i>
+                            <p>لا توجد سجلات مسجلة بعد</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            Object.keys(studentsRecords).forEach(studentId => {
+                const student = studentsRecords[studentId];
+                const pagesHtml = student.pages.map(p => `<span class="page-badge">${p}</span>`).join('');
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${studentId}</td>
+                    <td>${student.name}</td>
+                    <td><div class="pages-container">${pagesHtml}</div></td>
+                    <td>
+                        <a href="#" class="btn-view" onclick="openStudentPage('${studentId}')">
+                            <i class="fas fa-user"></i> صفحة الطالب
+                        </a>
+                    </td>
+                    <td class="actions">
+                        <button class="btn-primary action-btn" onclick="exportStudentData('${studentId}', 'excel')">
+                            <i class="fas fa-file-excel"></i> Excel
+                        </button>
+                        <button class="btn-primary action-btn" onclick="exportStudentData('${studentId}', 'pdf')">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        ${isAdmin || isOwner ? `
+                        <button class="btn-danger action-btn" onclick="deleteStudentRecords('${studentId}')">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                        ` : ''}
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // عرض سجلات طالب معين
+        function displayStudentRecords(studentId) {
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            const studentRecords = systemData.records.filter(r => r.studentId === studentId);
+            displayRecords(studentRecords);
+        }
+
+        // البحث في السجلات
+        function searchRecords() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            
+            const filteredRecords = systemData.records.filter(record => 
+                record.studentId.includes(searchTerm) ||
+                record.studentName.toLowerCase().includes(searchTerm) ||
+                record.pageNumber.toString().includes(searchTerm) ||
+                record.evaluation.toLowerCase().includes(searchTerm)
+            );
+            
+            displayRecords(filteredRecords);
+        }
+
+        // إعادة تعيين البحث
+        function resetSearch() {
+            document.getElementById('search').value = '';
+            displayRecords();
+        }
+
+        // فتح صفحة الطالب
+        function openStudentPage(studentId) {
+            currentStudentId = studentId;
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            const student = systemData.students.find(s => s.id === studentId);
+            
+            if (!student) {
+                alert('الطالب غير موجود');
+                return;
+            }
+            
+            // عرض بيانات الطالب
+            document.getElementById('student-details').innerHTML = `
+                <div class="detail-item">
+                    <strong>رقم الطالب:</strong> ${student.id}
+                </div>
+                <div class="detail-item">
+                    <strong>الاسم:</strong> ${student.name}
+                </div>
+                <div class="detail-item">
+                    <strong>المجموعة:</strong> ${student.group || 'غير محدد'}
+                </div>
+                <div class="detail-item">
+                    <strong>عدد الصفحات المحفوظة:</strong> ${systemData.records.filter(r => r.studentId === studentId).length}
+                </div>
+            `;
+            
+            // عرض سجلات الطالب
+            const studentRecords = systemData.records.filter(r => r.studentId === studentId)
+                .sort((a, b) => a.pageNumber - b.pageNumber);
+            
+            const recordsBody = document.getElementById('studentRecordsBody');
+            recordsBody.innerHTML = '';
+            
+            if (studentRecords.length === 0) {
+                recordsBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            <i class="fas fa-book-open"></i>
+                            <p>لا توجد سجلات مسجلة لهذا الطالب</p>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                studentRecords.forEach(record => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${record.pageNumber}</td>
+                        <td><span class="status-badge status-${getEvaluationClass(record.evaluation)}">${record.evaluation}</span></td>
+                        <td>${formatDate(record.date)}</td>
+                        <td>${record.notes || '-'}</td>
+                    `;
+                    recordsBody.appendChild(row);
+                });
+            }
+            
+            // إظهار صفحة الطالب وإخفاء السجلات
+            document.getElementById('records-tab').style.display = 'none';
+            document.getElementById('student-page').style.display = 'block';
+        }
+
+        // تصدير بيانات الطالب
+        function exportStudentData(studentId, format) {
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            const student = systemData.students.find(s => s.id === studentId);
+            const records = systemData.records.filter(r => r.studentId === studentId)
+                .sort((a, b) => a.pageNumber - b.pageNumber);
+            
+            if (!student) {
+                alert('الطالب غير موجود');
+                return;
+            }
+            
+            if (format === 'excel') {
+                // إنشاء مصنف Excel
+                const wb = XLSX.utils.book_new();
+                
+                // ورقة بيانات الطالب
+                const studentData = [
+                    ['رقم الطالب', 'اسم الطالب', 'المجموعة', 'عدد الصفحات المحفوظة'],
+                    [student.id, student.name, student.group || 'غير محدد', records.length]
+                ];
+                const studentWs = XLSX.utils.aoa_to_sheet(studentData);
+                XLSX.utils.book_append_sheet(wb, studentWs, 'بيانات الطالب');
+                
+                // ورقة سجلات الحفظ
+                const recordsData = records.map(record => [
+                    record.pageNumber,
+                    record.evaluation,
+                    record.date,
+                    record.notes || ''
+                ]);
+                recordsData.unshift(['رقم الصفحة', 'التقييم', 'التاريخ', 'ملاحظات']);
+                const recordsWs = XLSX.utils.aoa_to_sheet(recordsData);
+                XLSX.utils.book_append_sheet(wb, recordsWs, 'سجلات الحفظ');
+                
+                // حفظ الملف
+                XLSX.writeFile(wb, `سجل_حفظ_${student.name}_${student.id}.xlsx`);
+            } 
+            else if (format === 'pdf') {
+                // إنشاء مستند PDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // عنوان التقرير
+                doc.setFontSize(18);
+                doc.text(`سجل حفظ الطالب: ${student.name}`, 105, 15, null, null, 'center');
+                
+                // بيانات الطالب
+                doc.setFontSize(12);
+                doc.text(`رقم الطالب: ${student.id}`, 20, 30);
+                doc.text(`المجموعة: ${student.group || 'غير محدد'}`, 20, 40);
+                doc.text(`عدد الصفحات المحفوظة: ${records.length}`, 20, 50);
+                
+                // جدول السجلات
+                const headers = ['رقم الصفحة', 'التقييم', 'التاريخ', 'ملاحظات'];
+                const data = records.map(record => [
+                    record.pageNumber,
+                    record.evaluation,
+                    formatDate(record.date),
+                    record.notes || '-'
+                ]);
+                
+                doc.autoTable({
+                    startY: 60,
+                    head: [headers],
+                    body: data,
+                    theme: 'grid',
+                    styles: { font: 'Tajawal', fontSize: 10, halign: 'center' },
+                    headStyles: { fillColor: [26, 95, 122] }
+                });
+                
+                // حفظ الملف
+                doc.save(`سجل_حفظ_${student.name}_${student.id}.pdf`);
+            }
+        }
+
+        // حذف سجلات الطالب
+        function deleteStudentRecords(studentId) {
+            if (!confirm('هل أنت متأكد من حذف جميع سجلات هذا الطالب؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                return;
+            }
+            
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            systemData.records = systemData.records.filter(r => r.studentId !== studentId);
+            localStorage.setItem(APP_KEY, JSON.stringify(systemData));
+            
+            alert('تم حذف سجلات الطالب بنجاح');
+            displayRecords();
+        }
+
+        // تحميل قائمة المشرفين
+        function loadAdmins() {
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            const adminsTable = document.getElementById('admins-table-body');
+            adminsTable.innerHTML = '';
+            
+            systemData.admins.forEach(admin => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${admin.username}</td>
+                    <td>${admin.group || 'جميع المجموعات'}</td>
+                    <td>${(admin.permissions || []).join('، ')}</td>
+                    <td>
+                        <button class="btn-danger action-btn" onclick="deleteAdmin('${admin.username}')">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </td>
+                `;
+                adminsTable.appendChild(row);
+            });
+        }
+
+        // تحميل قائمة الطلاب
+        function loadStudents() {
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            const studentsTable = document.getElementById('students-table-body');
+            studentsTable.innerHTML = '';
+            
+            systemData.students.forEach(student => {
+                const recordsCount = systemData.records.filter(r => r.studentId === student.id).length;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        ${student.photo ? 
+                            `<img src="${student.photo}" class="student-photo">` : 
+                            `<div class="photo-placeholder"><i class="fas fa-user"></i></div>`
+                        }
+                    </td>
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.group || 'غير محدد'}</td>
+                    <td>${recordsCount}</td>
+                    <td>
+                        <button class="btn-primary action-btn" onclick="openStudentPage('${student.id}')">
+                            <i class="fas fa-eye"></i> عرض
+                        </button>
+                        <button class="btn-danger action-btn" onclick="deleteStudent('${student.id}')">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </td>
+                `;
+                studentsTable.appendChild(row);
+            });
+        }
+
+        // تحميل الإعدادات
+        function loadSettings() {
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            
+            if (systemData.settings) {
+                document.getElementById('welcome-message-input').value = systemData.settings.welcomeMessage;
+                document.getElementById('motivation-messages').value = systemData.settings.motivationMessages.join('\n');
+                
+                const logoPreview = document.getElementById('logo-preview');
+                if (systemData.settings.logo) {
+                    logoPreview.innerHTML = `<img src="${systemData.settings.logo}" class="student-photo">`;
+                } else {
+                    logoPreview.innerHTML = '<p>لا يوجد شعار</p>';
+                }
+            }
+        }
+
+        // حفظ الإعدادات
+        async function saveSettings() {
+            const welcomeMessage = document.getElementById('welcome-message-input').value;
+            const motivationMessages = document.getElementById('motivation-messages').value.split('\n');
+            const logoFile = document.getElementById('system-logo-input').files[0];
+            
+            let logoBase64 = null;
+            if (logoFile) {
+                logoBase64 = await toBase64(logoFile);
+            }
+            
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            systemData.settings = {
+                welcomeMessage,
+                motivationMessages: motivationMessages.filter(msg => msg.trim() !== ''),
+                logo: logoBase64 || systemData.settings.logo
+            };
+            
+            localStorage.setItem(APP_KEY, JSON.stringify(systemData));
+            document.getElementById('welcome-text').textContent = welcomeMessage;
+            
+            if (logoBase64) {
+                document.getElementById('system-logo').src = logoBase64;
+                document.getElementById('logo-preview').innerHTML = `<img src="${logoBase64}" class="student-photo">`;
+            }
+            
+            alert('تم حفظ الإعدادات بنجاح');
+        }
+
+        // إضافة مشرف
+        function addAdmin() {
+            const username = document.getElementById('new-admin-username').value;
+            const password = document.getElementById('new-admin-password').value;
+            const group = document.getElementById('new-admin-group').value;
+            
+            const permissions = [];
+            if(document.getElementById('perm-students').checked) permissions.push('students');
+            if(document.getElementById('perm-pages').checked) permissions.push('pages');
+            if(document.getElementById('perm-other-groups').checked) permissions.push('other-groups');
+            
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            // التحقق من عدم تكرار اسم المستخدم
+            if (systemData.admins.some(a => a.username === username)) {
+                alert('اسم المستخدم موجود مسبقاً');
+                return;
+            }
+            
+            systemData.admins.push({ username, password, group, permissions });
+            localStorage.setItem(APP_KEY, JSON.stringify(systemData));
+            
+            alert('تمت إضافة المشرف بنجاح');
+            loadAdmins();
+        }
+
+        // إضافة طالب
+        async function addStudent() {
+            const id = document.getElementById('new-student-id').value;
+            const name = document.getElementById('new-student-name').value;
+            const group = document.getElementById('new-student-group').value;
+            const photoFile = document.getElementById('new-student-photo').files[0];
+            
+            let photoBase64 = null;
+            if (photoFile) {
+                photoBase64 = await toBase64(photoFile);
+            }
+            
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            // التحقق من عدم تكرار رقم الطالب
+            if (systemData.students.some(s => s.id === id)) {
+                alert('رقم الطالب موجود مسبقاً');
+                return;
+            }
+            
+            systemData.students.push({ id, name, group, photo: photoBase64 });
+            localStorage.setItem(APP_KEY, JSON.stringify(systemData));
+            
+            alert('تمت إضافة الطالب بنجاح');
+            loadStudents();
+        }
+
+        // حذف مشرف
+        function deleteAdmin(username) {
+            if (!confirm(`هل أنت متأكد من حذف المشرف ${username}؟`)) {
+                return;
+            }
+            
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            systemData.admins = systemData.admins.filter(a => a.username !== username);
+            localStorage.setItem(APP_KEY, JSON.stringify(systemData));
+            loadAdmins();
+            alert('تم حذف المشرف بنجاح');
+        }
+
+        // حذف طالب
+        function deleteStudent(studentId) {
+            if (!confirm('هل أنت متأكد من حذف هذا الطالب وسجلاته؟')) {
+                return;
+            }
+            
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            systemData.students = systemData.students.filter(s => s.id !== studentId);
+            systemData.records = systemData.records.filter(r => r.studentId !== studentId);
+            localStorage.setItem(APP_KEY, JSON.stringify(systemData));
+            loadStudents();
+            alert('تم حذف الطالب بنجاح');
+        }
+
+        // تصدير جميع الطلاب
+        function exportAllStudents() {
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            
+            // إنشاء مصنف Excel
+            const wb = XLSX.utils.book_new();
+            
+            // بيانات الطلاب
+            const studentData = systemData.students.map(student => {
+                const recordsCount = systemData.records.filter(r => r.studentId === student.id).length;
+                return [
+                    student.id,
+                    student.name,
+                    student.group || 'غير محدد',
+                    recordsCount
+                ];
+            });
+            
+            studentData.unshift(['رقم الطالب', 'اسم الطالب', 'المجموعة', 'عدد الصفحات المحفوظة']);
+            
+            const ws = XLSX.utils.aoa_to_sheet(studentData);
+            XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
+            
+            // حفظ الملف
+            XLSX.writeFile(wb, 'جميع_الطلاب.xlsx');
+        }
+
+        // تحويل التقييم إلى كلاس CSS
+        function getEvaluationClass(evaluation) {
+            switch(evaluation) {
+                case 'ممتاز': return 'excellent';
+                case 'جيد جداً': return 'very-good';
+                case 'جيد': return 'good';
+                default: return '';
+            }
+        }
+
+        // تنسيق التاريخ
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('ar-EG', options);
+        }
+
+        // تحويل الملف إلى base64
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // تحديث الإحصائيات
+        function updateStats() {
+            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
+            document.getElementById('total-students').textContent = systemData.students.length;
+            document.getElementById('total-pages').textContent = systemData.records.length;
+            document.getElementById('total-admins').textContent = systemData.admins.length;
+            
+            // حساب عدد المجموعات
+            const groups = new Set(systemData.students.map(s => s.group));
+            document.getElementById('total-groups').textContent = groups.size;
+        }
+
         // عند تحميل الصفحة
         window.onload = function() {
             initSystem();
             toggleLoginFields();
-            
-            // إضافة مستخدم مالك إذا لم يكن موجوداً
-            const systemData = JSON.parse(localStorage.getItem(APP_KEY));
-            if (!systemData.owner) {
-                systemData.owner = {
-                    username: 'admin',
-                    password: 'admin123' // يجب تغييرها بعد التسجيل الأول
-                };
-                localStorage.setItem(APP_KEY, JSON.stringify(systemData));
-            }
         };
     </script>
 </body>
